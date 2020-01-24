@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <string>
+#include "map.h"
 
 int main(int argc, const char* argv[]) {
 	if (argc != 3) {
@@ -20,8 +21,8 @@ int main(int argc, const char* argv[]) {
 		contents = contents + line + "\n";
 	}
 
-	printf(contents.c_str());
-
+	Map* map = new Map(contents);
+	delete map;
 	system("pause");
 
 	return 0;
