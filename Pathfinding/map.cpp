@@ -8,6 +8,7 @@ Map::Map(std::string jsonRaw) {
 		return;
 	}
 
+	//create map of costs
 	Json::Value map = val["Map"];
 	if (map.empty()) {
 		printf("no map specified");
@@ -32,7 +33,13 @@ Map::Map(std::string jsonRaw) {
 				}
 			}
 		}
-		mapCosts.push_back(costs);
+		mapCosts.insert(mapCosts.begin(), costs);
+
+		//get source and dest
+		Json::Value jsonStart = val["Start"];
+		start = std::make_pair(jsonStart[0].asInt(), jsonStart[1].asInt());
+		Json::Value jsonDest = val["Destination"];
+		dest = std::make_pair(jsonDest[0].asInt(), jsonDest[1].asInt());
 	}
 }
 
@@ -44,5 +51,8 @@ std::string Map::findPath() {
 		}
 		printf("\n");
 	}
+
+	printf("start at %d, %d\n", start.first, start.second);
+	printf("dest at %d, %d\n", dest.first, dest.second);
 	return "foo";
 }
