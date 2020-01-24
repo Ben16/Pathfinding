@@ -1,5 +1,6 @@
 #include <json/json.h>
 #include <string>
+#include <vector>
 #ifndef MAP
 #define MAP
 
@@ -9,6 +10,7 @@ public:
 	Json::Value val;
 	Map(std::string jsonRaw);
 	std::string findPath();
+	std::vector<std::vector<int>> mapCosts;
 };
 
 #endif

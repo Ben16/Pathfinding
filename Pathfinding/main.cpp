@@ -22,6 +22,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	Map* map = new Map(contents);
+	map->findPath();
 	delete map;
 	system("pause");
 
