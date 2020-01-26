@@ -22,7 +22,12 @@ int main(int argc, const char* argv[]) {
 	}
 
 	Map* map = new Map(contents);
-	map->findPath();
+	auto output = map->findPath();
+	printf("Start printing answer");
+	for (std::pair<int, int> tile : output) {
+		printf("[%d,%d]", tile.first, tile.second);
+	}
+	printf("End printing answer");
 	delete map;
 	system("pause");
 
