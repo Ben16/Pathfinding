@@ -187,5 +187,7 @@ std::vector<std::pair<int, int>> Map::findPath() {
 	printf("start at %d, %d\n", start.first, start.second);
 	printf("dest at %d, %d\n", dest.first, dest.second);*/
 
+	std::reverse(path.begin(), path.end()); //correct order
+
 	return path;
 }
