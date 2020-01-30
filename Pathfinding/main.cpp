@@ -182,7 +182,13 @@ std::vector<std::pair<float, float>> smoothPaths(std::vector<std::pair<int, int>
 			}
 
 			for (int j = convertedIndex + 1; j <= convertedIndex + numWithoutTurn; ++j) {
-				ret.push_back(std::make_pair((float)originalPaths[j].first + (deltaX * (j - convertedIndex)), (float)originalPaths[j].second + (deltaY * (j - convertedIndex))));
+				//check not double counting
+				float newX = (float)originalPaths[j].first + (deltaX * (j - convertedIndex) + shiftX);
+				float newY = (float)originalPaths[j].second + (deltaY * (j - convertedIndex) + shiftY);
+				std::pair<float, float> last = ret[ret.size() - 1];
+				if (newX != last.first || newY != last.second) {
+					ret.push_back(std::make_pair(newX, newY));
+				}
 			}
 			//we have made it to the corner. This corner will double count, essentially, so we need to "skip" one tile
 			convertedIndex += numWithoutTurn + 1;
@@ -202,7 +208,13 @@ std::vector<std::pair<float, float>> smoothPaths(std::vector<std::pair<int, int>
 		deltaY = 1.0;
 	}
 	for (int i = convertedIndex + 1; i < originalPaths.size(); ++i) {
-		ret.push_back(std::make_pair((float)originalPaths[i].first + deltaX, (float)originalPaths[i].second + deltaY));
+		//check that we're not double counting a point
+		float newX = (float)originalPaths[i].first + deltaX;
+		float newY = (float)originalPaths[i].second + deltaY;
+		std::pair<float, float> last = ret[ret.size() - 1];
+		if (newX != last.first || newY != last.second) {
+			ret.push_back(std::make_pair(newX, newY));
+		}
 	}
 
 	return ret;
