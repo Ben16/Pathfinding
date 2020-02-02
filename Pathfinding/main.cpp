@@ -233,11 +233,12 @@ int main(int argc, const char* argv[]) {
 	bool smooth = false;
 	if (argc > 3) {
 		//printf("argv3 is %s\n", argv[3]);
-		//if (argv[3] == "-s") {
-		printf("smoothing");
-		smooth = true;
-		//}
+		if (std::string(argv[3]) == "-s") {
+			printf("smoothing");
+			smooth = true;
+		}
 	}
+	std::string outputFile = std::string(argv[2]);
 	std::ifstream input;
 	input.open(argv[1]);
 	if (!input) {
@@ -253,17 +254,21 @@ int main(int argc, const char* argv[]) {
 	std::vector<std::pair<int, int>> output = map->findPath();
 	printf("Start printing answer");
 
+	FILE * out;
+	fopen_s(&out, outputFile.c_str(), "w");
+
 	if (smooth) {
 		std::vector<std::pair<float, float>> floatOutput = smoothPaths(output);
 		for (std::pair<float, float> tile : floatOutput) {
-			printf("[%f,%f]\n", tile.first, tile.second);
+			fprintf(out, "[%f,%f]\n", tile.first, tile.second);
 		}
 	}
 	else {
 		for (std::pair<int, int> tile : output) {
-			printf("[%d,%d]\n", tile.first, tile.second);
+			fprintf(out, "[%d,%d]\n", tile.first, tile.second);
 		}
 	}
+	fclose(out);
 
 	printf("End printing answer");
 	delete map;
