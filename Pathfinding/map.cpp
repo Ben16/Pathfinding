@@ -1,5 +1,4 @@
 #include "map.h"
-#include "json/json.h"
 
 Map::Map(std::string jsonRaw) {
 	bool success = reader.parse(jsonRaw.c_str(), val);
@@ -27,7 +26,7 @@ Map::Map(std::string jsonRaw) {
 				costs.push_back(-1);
 			}
 			else {
-				int val = (int)current - 48;
+				int val = (int)current - 48; // convert string of number to actual int
 				if (val > 0 && val <= 9) {
 					costs.push_back(val);
 				}
@@ -37,8 +36,17 @@ Map::Map(std::string jsonRaw) {
 
 		//get source and dest
 		Json::Value jsonStart = val["Start"];
+		if (jsonStart.empty()) {
+			printf("no start location specified");
+			return;
+		}
 		start = std::make_pair(jsonStart[0].asInt(), jsonStart[1].asInt());
+
 		Json::Value jsonDest = val["Destination"];
+		if (jsonDest.empty()) {
+			printf("no destination location specified");
+			return;
+		}
 		dest = std::make_pair(jsonDest[0].asInt(), jsonDest[1].asInt());
 	}
 }
@@ -49,8 +57,6 @@ int Map::heuristic(std::pair<int, int> current, std::pair<int, int> dest) {
 	int b = pow(dest.second - current.second, 2);
 	int result = pow(a + b, 0.5f);
 	return result;
-	//manhattan distance
-	//return abs(current.first - dest.first) + abs(current.second - dest.second);
 }
 
 int Map::indexOf(std::vector<std::pair<int, int>> vec, std::pair<int, int> elem) {
@@ -94,30 +100,16 @@ std::vector<std::pair<int, int>> Map::findPath() {
 		}
 	}
 
-	//for debugging
-	/*for (int i = 0; i < costs.size(); ++i) {
-		for (int j = 0; j < costs[i].size(); ++j) {
-			printf("%d", costs[i][j]);
-		}
-		printf("\n");
-	}
-
-	printf("start at %d, %d\n", start.first, start.second);
-	printf("dest at %d, %d\n", dest.first, dest.second);*/
-
 	std::map<std::pair<int, int>, std::pair<int, int>> previousTile;
 	std::vector<std::pair<int, int>> toTraverse;
-	std::vector<std::pair<int, int>> blacklist;
 	toTraverse.push_back(start);
 
 	//build the path
 	while (toTraverse.size() > 0) {
 		std::pair<int, int> traversing = toTraverse.back();
 		toTraverse.pop_back();
-		blacklist.push_back(traversing);
 		if (traversing.first == dest.first && traversing.second == dest.second) {
 			//we are at the end
-			printf("Reached the end");
 			break;
 		}
 
@@ -132,10 +124,6 @@ std::vector<std::pair<int, int>> Map::findPath() {
 			if (costs[y][x] == 0 || costs[y][x] > newCost) {
 				costs[y][x] = newCost;
 				previousTile[tile] = traversing; 
-				//printf("[%d,%d] leads to [%d,%d]\n", traversing.first, traversing.second, tile.first, tile.second);
-				if (indexOf(blacklist, tile) != -1) {
-					//continue;
-				}
 				int index = indexOf(toTraverse, tile);
 				if (index > -1) {
 					toTraverse.erase(toTraverse.begin() + index); // need to update priority
@@ -175,17 +163,6 @@ std::vector<std::pair<int, int>> Map::findPath() {
 		current = previousTile[current];
 		path.push_back(current);
 	}
-
-	//debug to see final costs
-	/*for (int i = 0; i < costs.size(); ++i) {
-		for (int j = 0; j < costs[i].size(); ++j) {
-			printf("[%d]", costs[i][j]);
-		}
-		printf("\n");
-	}
-
-	printf("start at %d, %d\n", start.first, start.second);
-	printf("dest at %d, %d\n", dest.first, dest.second);*/
 
 	std::reverse(path.begin(), path.end()); //correct order
 

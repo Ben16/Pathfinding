@@ -192,7 +192,6 @@ std::vector<std::pair<float, float>> smoothPaths(std::vector<std::pair<int, int>
 			}
 			//we have made it to the corner. This corner will double count, essentially, so we need to "skip" one tile
 			convertedIndex += numWithoutTurn + 1;
-			//++i;
 			numWithoutTurn = 0;
 			direction = ""; //treat first tile after turn like new start
 		}
@@ -221,20 +220,13 @@ std::vector<std::pair<float, float>> smoothPaths(std::vector<std::pair<int, int>
 }
 
 int main(int argc, const char* argv[]) {
-	for (int i = 0; i < argc; ++i) {
-		printf("%s\n", argv[i]);
-	}
 	if (argc < 3) {
-		printf("Please run this program again, specifying an input file and an output file.");
-		system("pause");
+		printf("Usage: Pathfinding.exe inputfile.json outputfile.json [-s].");
 		return 0;
 	}
-	printf("The input file is %s and the output file is %s \n", argv[1], argv[2]);
 	bool smooth = false;
 	if (argc > 3) {
-		//printf("argv3 is %s\n", argv[3]);
 		if (std::string(argv[3]) == "-s") {
-			printf("smoothing");
 			smooth = true;
 		}
 	}
@@ -243,6 +235,7 @@ int main(int argc, const char* argv[]) {
 	input.open(argv[1]);
 	if (!input) {
 		printf("The file %s does not exist.", argv[1]);
+		return 0;
 	}
 	std::string contents = "";
 	std::string line;
@@ -252,27 +245,39 @@ int main(int argc, const char* argv[]) {
 
 	Map* map = new Map(contents);
 	std::vector<std::pair<int, int>> output = map->findPath();
-	printf("Start printing answer");
 
 	FILE * out;
 	fopen_s(&out, outputFile.c_str(), "w");
 
+	fprintf(out, "[\n");
+
 	if (smooth) {
 		std::vector<std::pair<float, float>> floatOutput = smoothPaths(output);
-		for (std::pair<float, float> tile : floatOutput) {
-			fprintf(out, "[%f,%f]\n", tile.first, tile.second);
+		for (int i = 0; i < floatOutput.size(); ++i) {
+			if (i < floatOutput.size() - 1) {
+				fprintf(out, "[%f,%f],\n", floatOutput[i].first, floatOutput[i].second);
+			}
+			else {
+				fprintf(out, "[%f,%f]\n", floatOutput[i].first, floatOutput[i].second);
+			}
 		}
 	}
 	else {
-		for (std::pair<int, int> tile : output) {
-			fprintf(out, "[%d,%d]\n", tile.first, tile.second);
+		for (int i = 0; i < output.size(); ++i) {
+			if (i < output.size() - 1) {
+				fprintf(out, "[%d,%d],\n", output[i].first, output[i].second);
+			}
+			else {
+				fprintf(out, "[%d,%d]\n", output[i].first, output[i].second);
+			}
 		}
 	}
+
+	fprintf(out, "]");
+
 	fclose(out);
 
-	printf("End printing answer");
 	delete map;
-	system("pause");
 
 	return 0;
 }
